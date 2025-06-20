@@ -1,16 +1,32 @@
-import React , {useState}from 'react'
+import React , {useEffect, useState, useContext}from 'react'
 import MealCard from './MealCard';
+import {mealContext} from '../Context/mealContext';
 function Meals() {
 
     const [input, setInput] = useState('');
-    const [items, setItems] = useState([]);
     const [msg, setMsg] = useState('')
     const [msg2, setMsg2] = useState('')
+    const {items, setItems} = useContext(mealContext)
+
+    useEffect(() => {
+    const fetchMeals = async () => {
+        try {
+            const response = await fetch("https://api.freeapi.app/api/v1/public/meals");
+            const data = await response.json();
+            setItems(data.data.data);
+        } catch (error) {
+            console.error('Error fetching initial meals:', error);
+        }
+    };
+
+    fetchMeals();
+}, []);
+
     const submit = async (input) => {
         try {
             if (input === '') {
                 setMsg('Please Enter a Meal Name')
-                console.log('Please Enter  Meal Name', msg)
+               
             }
             else {
                 
@@ -60,7 +76,7 @@ function Meals() {
 
             <div className='flex flex-wrap justify-center max-w-7xl mt-7 pb-12 mx-10 md:mx-auto gap-6   '>
                 {items ? items.map((meal) => (
-                    <div className='w-full sm:w-1/2 md:w-1/3 lg:w-1/4' key={meal.idMeal}>
+                    <div className='w-full sm:w-1/2 md:w-1/4 lg:w-1/5' key={meal.idMeal}>
                         <MealCard meal={meal} />
                     </div>
                 )) : <p className='text-2xl font-bold mt-4 text-center '>Recipe Not Found!</p>}
